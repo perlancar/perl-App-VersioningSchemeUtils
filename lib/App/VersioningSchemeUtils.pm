@@ -9,7 +9,7 @@ use warnings;
 
 our %SPEC;
 
-our %arg0_scheme = (
+our %arg_scheme = (
     scheme => {
         schema => ['str*', match=>qr/\A\w+\z/],
         req => 1,
@@ -64,9 +64,11 @@ $SPEC{list_versioning_schemes} = {
 };
 sub list_versioning_schemes {
     require PERLANCAR::Module::List;
-    my %mods = PERLANCAR::Module::List::list_modules(
+    my $mods = PERLANCAR::Module::List::list_modules(
         'Versioning::Scheme::', {list_modules=>1});
-    [200, "OK", [sort keys %mods]];
+    my @rows;
+    for (sort keys %$mods) { s/\AVersioning::Scheme:://; push @rows, $_ }
+    [200, "OK", \@rows];
 }
 
 $SPEC{bump_version} = {
